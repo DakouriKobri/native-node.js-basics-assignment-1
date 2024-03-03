@@ -1,11 +1,15 @@
 function requestHandler(req, res) {
   const url = req.url;
+  const method = req.method;
 
   if (url === '/') {
     res.setHeader('Content-Type', 'text/html');
     res.write(`
-    <html>
+    <!DOCTYPE html>
+    <html lang="en">
     <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>New User Form</title>
     </head>
 
@@ -21,24 +25,48 @@ function requestHandler(req, res) {
     </html>
     `);
     res.end();
-  } else if (url === '/create-user') {
-    res.setHeader('Content-Type', 'text/html');
-    res.write(`
-    <html>
+  } else if (url === '/create-user' && method === 'POST') {
+    const body = [];
+
+    req.on('data', (chunk) => body.push(chunk));
+
+    return req.on('end', () => {
+      const parsedBody = Buffer.concat(body).toString();
+      const nonFormattedUsername = parsedBody.split('=')[1];
+      const username = nonFormattedUsername.replace(/[^a-zA-Z0-9]/g, ' ');
+      const result = username
+        ? `username:  ${username}`
+        : 'No user created. Please, provide a username.';
+      console.log(result);
+
+      res.setHeader('Content-Type', 'text/html');
+      res.write(`
+    <!DOCTYPE html>
+    <html lang="en">
     <head>
-    <title>User Created</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User ${username ? '' : 'not'} Created</title>
     </head>
     <body>
-      <h2>User created!</h2>
+      <h2> ${
+        username
+          ? 'User <i>' + username + '</i>'
+          : 'Please, provide a username. No user was'
+      } created.
     </body>
     </html>
     `);
-    res.end();
+      res.end();
+    });
   } else if (url === '/users') {
     res.setHeader('Content-Type', 'text/html');
     res.write(`
-    <html>
+    <!DOCTYPE html>
+    <html lang="en">
     <head>
+      <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Users</title>
     </head>
     <body>
@@ -55,8 +83,11 @@ function requestHandler(req, res) {
   } else {
     res.setHeader('Content-Type', 'text/html');
     res.write(`
-    <html>
+    <!DOCTYPE html>
+    <html lang="en">
     <head>
+      <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Not Found</title>
     </head>
     <body>
