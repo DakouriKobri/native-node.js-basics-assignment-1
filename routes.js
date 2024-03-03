@@ -6,10 +6,30 @@ function requestHandler(req, res) {
     res.write(`
     <html>
     <head>
-    <title>Greetings</title>
+    <title>New User Form</title>
+    </head>
+
+    <body>
+      <h2>New User Form</h2>
+      <form action="/create-user" method="POST">
+        <label for="username">User Name</label>
+        <input id="username" name="username" type="text">
+
+        <button type="submit">Submit</button>
+      </form>
+    </body>
+    </html>
+    `);
+    res.end();
+  } else if (url === '/create-user') {
+    res.setHeader('Content-Type', 'text/html');
+    res.write(`
+    <html>
+    <head>
+    <title>User Created</title>
     </head>
     <body>
-      <h1>Hello, from Native Node.js server!</h1>
+      <h2>User created!</h2>
     </body>
     </html>
     `);
